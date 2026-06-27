@@ -141,7 +141,7 @@ export function productJsonLd(
 
   // Add category
   if (product.categories?.length) {
-    schema.category = product.categories[0].name;
+    schema.category = product.categories[0]!.name;
   }
 
   return JSON.stringify(schema);
