@@ -1,11 +1,11 @@
-export { casualSizeChart } from "./casual.ts";
-export { formalSizeChart } from "./formal.ts";
-export { sportSizeChart } from "./sport.ts";
+export { casualSizeChart } from "./casual";
+export { formalSizeChart } from "./formal";
+export { sportSizeChart } from "./sport";
 
-import { casualSizeChart } from "./casual.ts";
-import { formalSizeChart } from "./formal.ts";
-import { sportSizeChart } from "./sport.ts";
-import type { SizeChartCategory, SizeChart } from "../../schemas/product.schema.ts";
+import { casualSizeChart } from "./casual";
+import { formalSizeChart } from "./formal";
+import { sportSizeChart } from "./sport";
+import type { SizeChartCategory, SizeChart } from "../../schemas/product.schema";
 
 /**
  * Map of all size charts by category.
