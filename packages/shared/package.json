@@ -1,0 +1,20 @@
+{
+  "name": "@tienda/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    "./schemas": "./schemas/index.ts",
+    "./schemas/*": "./schemas/*.ts",
+    "./data/size-charts": "./data/size-charts/index.ts",
+    "./data/size-charts/*": "./data/size-charts/*.ts"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

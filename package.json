@@ -1,0 +1,34 @@
+{
+  "name": "tienda-de-ropa",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Tienda de ropa infantil — Children's clothing store",
+  "workspaces": [
+    "packages/*",
+    "storefront"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=storefront",
+    "build": "npm run build --workspace=storefront",
+    "lint": "npm run lint --workspace=storefront",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "db:generate": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "db:migrate": "npx prisma migrate dev",
+    "db:seed": "npx prisma db seed",
+    "db:studio": "npx prisma studio",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.0",
+    "prettier-plugin-tailwindcss": "^0.6.0",
+    "prisma": "^6.5.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

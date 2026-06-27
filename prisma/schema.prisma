@@ -1,0 +1,286 @@
+// ──────────────────────────────────────────────
+// Tienda de Ropa Infantil — Prisma Schema
+// PostgreSQL 16 + Prisma 6
+// ──────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Auth ─────────────────────────────────────
+
+enum Role {
+  CUSTOMER
+  ADMIN
+  SUPER_ADMIN
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(CUSTOMER)
+  phone         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+  reviews  Review[]
+  wishlist WishlistItem[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ── Reviews ──────────────────────────────────
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  orderId   String?
+  rating    Int
+  comment   String?  @db.Text
+  status    ReviewStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, productId])
+  @@index([productId, status])
+}
+
+// ── Wishlist ─────────────────────────────────
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  variantId String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, productId, variantId])
+  @@index([userId])
+}
+
+// ── Store / Pickup Locations ─────────────────
+
+model Store {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  address   String
+  city      String
+  phone     String?
+  lat       Float
+  lng       Float
+  hours     Json     @default("{}")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  storeHours StoreHours[]
+  orders    Order[]
+}
+
+model StoreHours {
+  id        String  @id @default(cuid())
+  storeId   String
+  dayOfWeek Int     // 0=Sunday, 1=Monday ... 6=Saturday
+  openTime  String  // "09:00"
+  closeTime String  // "20:00"
+  isClosed  Boolean @default(false)
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@unique([storeId, dayOfWeek])
+}
+
+// ── Stripe webhook idempotency ───────────────
+
+model StripeEvent {
+  id              String   @id
+  stripeEventId   String   @unique
+  type            String
+  processedAt     DateTime @default(now())
+
+  @@index([stripeEventId])
+}
+
+// ── Pickup codes ────────────────────────────
+
+model PickupCode {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  code      String   @unique
+  storeId   String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([code])
+  @@index([orderId])
+}
+
+// ── Categories ────────────────────────────────
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  handle      String     @unique
+  description String?    @db.Text
+  parentId    String?
+  order       Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+  products Product[]
+
+  @@index([parentId])
+  @@index([handle])
+}
+
+// ── Products ──────────────────────────────────
+
+model Product {
+  id              String            @id @default(cuid())
+  title           String
+  handle          String            @unique
+  description     String?           @db.Text
+  thumbnail       String?
+  images          Json              @default("[]")
+  material        String?
+  countryOfOrigin String?
+  ageRange    String?
+  categoryId  String?
+  views       Int           @default(0)
+  certifications  Json          @default("[]")
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  category  Category?  @relation(fields: [categoryId], references: [id])
+  ageGroup  AgeRange?  @relation(fields: [ageRange], references: [slug])
+  variants  ProductVariant[]
+}
+
+model AgeRange {
+  id       String    @id @default(cuid())
+  slug     String    @unique
+  name     String
+  min      Int
+  max      Int
+
+  products Product[]
+
+  @@index([slug])
+}
+
+model ProductVariant {
+  id                String  @id @default(cuid())
+  productId         String
+  sku               String  @unique
+  title             String  // size or name
+  color             String?
+  price             Int     // cents
+  currency          String  @default("EUR")
+  inventoryQuantity Int     @default(0)
+  allowBackorder    Boolean @default(false)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([sku])
+}
+
+// ── Orders ─────────────────────────────────────
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  PICKED_UP
+  CANCELLED
+}
+
+model Order {
+  id               String      @id @default(cuid())
+  customerEmail    String
+  customerName     String
+  customerId       String?
+  items            Json
+  total            Int         // cents
+  currency         String      @default("EUR")
+  status           OrderStatus @default(PENDING)
+  storeId          String
+  stripeSessionId  String?
+  pickupCode       String?     @unique
+  notes            String?     @db.Text
+  statusHistory    Json        @default("[]")
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id])
+
+  @@index([storeId, status])
+  @@index([stripeSessionId])
+  @@index([customerEmail])
+  @@index([pickupCode])
+  @@index([customerId])
+}

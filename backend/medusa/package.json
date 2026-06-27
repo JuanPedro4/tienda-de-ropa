@@ -1,0 +1,26 @@
+{
+  "name": "@tienda/medusa-backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "medusa develop",
+    "build": "medusa build",
+    "start": "medusa start",
+    "seed": "medusa exec ./src/seed/index.ts",
+    "migrate": "medusa migrations run"
+  },
+  "dependencies": {
+    "@medusajs/admin-sdk": "^2.15.5",
+    "@medusajs/cli": "^2.15.5",
+    "@medusajs/file-local": "^2.15.5",
+    "@medusajs/medusa": "^2.15.5",
+    "@medusajs/notification-local": "^2.15.5",
+    "@medusajs/utils": "^2.15.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
