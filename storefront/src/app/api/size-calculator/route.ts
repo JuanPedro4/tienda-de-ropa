@@ -7,7 +7,6 @@ import {
   findSizeByHeight,
   sizeCharts,
 } from "@tienda/shared/data/size-charts";
-import type { SizeChartCategory } from "@tienda/shared/schemas";
 
 export async function POST(request: Request) {
   try {

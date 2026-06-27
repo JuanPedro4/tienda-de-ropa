@@ -66,7 +66,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     if (typeof value === "string") {
       resolvedParams[key] = value;
     } else if (Array.isArray(value) && value.length > 0) {
-      resolvedParams[key] = value[0];
+      resolvedParams[key] = value[0]!;
     }
   }
 

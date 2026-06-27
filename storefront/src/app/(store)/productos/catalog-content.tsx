@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import FilterSidebar from "@/components/catalog/FilterSidebar";
 import ProductGrid from "@/components/catalog/ProductGrid";
 import SearchBar from "@/components/catalog/SearchBar";
@@ -89,12 +89,12 @@ export default function CatalogPageContent({
       return true;
     }).sort((a, b) => {
       if (sort === "vistos") return b.views - a.views;
-      if (sort === "price_asc") {
+      if (sort === "price-asc") {
         const aMin = Math.min(...a.variants.map((v) => v.price ?? Infinity));
         const bMin = Math.min(...b.variants.map((v) => v.price ?? Infinity));
         return aMin - bMin;
       }
-      if (sort === "price_desc") {
+      if (sort === "price-desc") {
         const aMin = Math.min(...a.variants.map((v) => v.price ?? Infinity));
         const bMin = Math.min(...b.variants.map((v) => v.price ?? Infinity));
         return bMin - aMin;

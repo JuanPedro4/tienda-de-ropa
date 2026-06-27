@@ -1,7 +1,6 @@
 import { auth, signIn } from "@/lib/auth/auth";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Iniciar sesión | Tienda Peques",

@@ -5,7 +5,7 @@ export {
   SizeChartCategorySchema,
   SizeEntrySchema,
   CertificationSchema,
-} from "./product.schema.ts";
+} from "./product.schema";
 export type {
   ProductInput,
   ProductUpdate,
@@ -13,10 +13,10 @@ export type {
   SizeChartCategory,
   SizeEntry,
   Certification,
-} from "./product.schema.ts";
+} from "./product.schema";
 
-export { VariantSchema, VariantUpdateSchema } from "./variant.schema.ts";
-export type { VariantInput, VariantUpdate } from "./variant.schema.ts";
+export { VariantSchema, VariantUpdateSchema } from "./variant.schema";
+export type { VariantInput, VariantUpdate } from "./variant.schema";
 
 export {
   CartItemSchema,
@@ -27,7 +27,7 @@ export {
   OrderSummarySchema,
   MarkReadySchema,
   MarkPickedUpSchema,
-} from "./checkout.schema.ts";
+} from "./checkout.schema";
 export type {
   CartItemInput,
   FullCartItem,
@@ -37,13 +37,13 @@ export type {
   OrderSummary,
   MarkReadyInput,
   MarkPickedUpInput,
-} from "./checkout.schema.ts";
+} from "./checkout.schema";
 
-export { ReviewSchema, ReviewUpdateSchema, ReviewStatusSchema } from "./review.schema.ts";
-export type { ReviewInput, ReviewUpdate, ReviewStatus } from "./review.schema.ts";
+export { ReviewSchema, ReviewUpdateSchema, ReviewStatusSchema } from "./review.schema";
+export type { ReviewInput, ReviewUpdate, ReviewStatus } from "./review.schema";
 
 export {
   SizeCalculatorInputSchema,
   SizeRecommendationSchema,
-} from "./size.schema.ts";
-export type { SizeCalculatorInput, SizeRecommendation } from "./size.schema.ts";
+} from "./size.schema";
+export type { SizeCalculatorInput, SizeRecommendation } from "./size.schema";

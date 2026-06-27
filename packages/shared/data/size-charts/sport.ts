@@ -1,4 +1,4 @@
-import type { SizeChart } from "../../schemas/product.schema.ts";
+import type { SizeChart } from "../../schemas/product.schema";
 
 /**
  * EN 13402 size chart for sport / active wear.

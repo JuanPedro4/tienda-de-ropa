@@ -69,7 +69,7 @@ const MOCK_PRODUCT = {
 };
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  await params;
 
   // In production, fetch product by handle from Medusa
   const productTitle = "Camiseta de algodón orgánico";
@@ -85,7 +85,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       title: `${productTitle} — Tienda Peques`,
       description: productDescription,
       locale: "es_ES",
-      type: "product",
+      type: "website",
       images: [],
       // og:price:amount and og:price:currency via other metadata
     },
