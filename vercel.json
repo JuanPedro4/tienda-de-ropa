@@ -1,6 +1,5 @@
 {
   "framework": "nextjs",
-  "rootDirectory": "storefront",
   "buildCommand": "npx next build",
   "outputDirectory": ".next"
 }
