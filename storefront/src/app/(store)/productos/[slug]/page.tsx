@@ -6,122 +6,54 @@ import VariantSelectorWrapper from "./variant-selector-wrapper";
 import Breadcrumbs from "@/components/pdp/Breadcrumbs";
 import ReviewsWrapper from "./reviews-wrapper";
 import { productJsonLd, breadcrumbJsonLd, JsonLd } from "@/lib/seo/json-ld";
+import { getProductByHandle } from "@/lib/products/product-detail";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
 }
 
-// ─── Mock product data for development ───────────────────────
-const MOCK_PRODUCT = {
-  id: "prod-mock-1",
-  title: "Camiseta de algodón orgánico",
-  subtitle: "Suave, transpirable y cómoda para el día a día",
-  handle: "camiseta-algodon-organico",
-  description:
-    "Camiseta infantil confeccionada en algodón orgánico certificado GOTS. Diseñada para ofrecer la máxima comodidad durante todo el día.\n\n• Algodón 100% orgánico\n• Tejido de punto suave\n• Costuras reforzadas\n• Etiqueta sin roce\n• Teñido con colorantes libres de químicos",
-  material: "100% Algodón orgánico certificado GOTS",
-  originCountry: "España",
-  thumbnail: null,
-  images: [] as { url: string; alt: string | null }[],
-  variants: [
-    {
-      id: "var-size-92",
-      sku: "CAM-ORG-092",
-      title: "92",
-      inventoryQuantity: 15,
-      allowBackorder: false,
-      options: [{ name: "Talle", value: "92" }],
-      prices: [{ amount: 2490, currencyCode: "EUR" }],
-    },
-    {
-      id: "var-size-104",
-      sku: "CAM-ORG-104",
-      title: "104",
-      inventoryQuantity: 8,
-      allowBackorder: false,
-      options: [{ name: "Talle", value: "104" }],
-      prices: [{ amount: 2690, currencyCode: "EUR" }],
-    },
-    {
-      id: "var-size-116",
-      sku: "CAM-ORG-116",
-      title: "116",
-      inventoryQuantity: 0,
-      allowBackorder: false,
-      options: [{ name: "Talle", value: "116" }],
-      prices: [{ amount: 2990, currencyCode: "EUR" }],
-    },
-    {
-      id: "var-size-128",
-      sku: "CAM-ORG-128",
-      title: "128",
-      inventoryQuantity: 3,
-      allowBackorder: false,
-      options: [{ name: "Talle", value: "128" }],
-      prices: [{ amount: 3190, currencyCode: "EUR" }],
-    },
-  ],
-  categories: [{ id: "cat-1", name: "Casual", handle: "casual" }],
-  certifications: [
-    { name: "GOTS", badge: undefined },
-    { name: "OEKO-TEX Standard 100", badge: undefined },
-  ],
-};
+const CATEGORY_SLUGS = new Set(["casual", "arreglada", "deporte"]);
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
-  await params;
+  const { slug } = await params;
+  const product = await getProductByHandle(slug);
 
-  // In production, fetch product by handle from Medusa
-  const productTitle = "Camiseta de algodón orgánico";
-  const productDescription =
-    "Camiseta infantil de algodón orgánico certificado GOTS. Suave, transpirable y cómoda. Talles 92-128 cm.";
-  const productPrice = 2490;
-  const priceCurrency = "EUR";
+  if (!product) {
+    return { title: "Producto no encontrado | Tienda Peques" };
+  }
 
   return {
-    title: `${productTitle} | Tienda Peques`,
-    description: productDescription,
+    title: `${product.title} | Tienda Peques`,
+    description: product.description.slice(0, 160),
     openGraph: {
-      title: `${productTitle} — Tienda Peques`,
-      description: productDescription,
+      title: `${product.title} — Tienda Peques`,
+      description: product.description.slice(0, 160),
       locale: "es_ES",
       type: "website",
-      images: [],
-      // og:price:amount and og:price:currency via other metadata
+      images: product.images.map((img) => ({ url: img.url })),
     },
     twitter: {
       card: "summary_large_image",
-      title: `${productTitle} — Tienda Peques`,
-      description: productDescription,
-      images: [],
+      title: `${product.title} — Tienda Peques`,
+      description: product.description.slice(0, 160),
+      images: product.images.map((img) => ({ url: img.url })),
     },
     other: {
-      "og:price:amount": String(productPrice / 100),
-      "og:price:currency": priceCurrency,
+      "og:price:amount": String((product.variants[0]?.prices[0]?.amount ?? 0) / 100),
+      "og:price:currency": product.variants[0]?.prices[0]?.currencyCode ?? "EUR",
     },
   };
 }
 
-const CATEGORY_SLUGS = new Set(["casual", "arreglada", "deporte"]);
-
-export default async function ProductDetailPage({
-  params,
-}: ProductPageProps) {
+export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
 
-  // If slug matches a category, redirect to catalog with filter
   if (CATEGORY_SLUGS.has(slug)) {
     redirect(`/productos?categoria=${slug}`);
   }
 
-  // In production, fetch product by handle from Medusa:
-  // const { data, errors } = await medusaQuery(PRODUCT_BY_HANDLE_QUERY, { handle: slug });
-  // if (errors || !data?.product) notFound();
-  // const product = data.product;
-
-  if (!slug) notFound();
-
-  const product = MOCK_PRODUCT;
+  const product = await getProductByHandle(slug);
+  if (!product) notFound();
 
   const category = product.categories[0];
 
@@ -143,10 +75,8 @@ export default async function ProductDetailPage({
       />
 
       <div className="grid gap-8 lg:grid-cols-2">
-        {/* Left: Image gallery */}
         <ImageGallery images={product.images} title={product.title} />
 
-        {/* Right: Product info and actions */}
         <div>
           <ProductInfo product={product} />
           <div className="mt-6 space-y-4">
@@ -160,10 +90,8 @@ export default async function ProductDetailPage({
         </div>
       </div>
 
-      {/* Reviews section */}
       <ReviewsWrapper productId={product.id} />
 
-      {/* Schema.org JSON-LD */}
       <JsonLd jsonLd={productJsonLd(product)} />
       <JsonLd
         jsonLd={breadcrumbJsonLd([
